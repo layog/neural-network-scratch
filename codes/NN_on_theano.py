@@ -168,52 +168,53 @@ def train_network(net, alpha, lmbda, batch_size, alphas, breaks, epochs):
     # print accuracy after the training
 
 
-data = readData("trainingData.json")
-print "Data Reading Completes"
-training_data = data[:45000]
-x, y = zip(*training_data)
-x = np.array(x)
-y = np.array(y)
-x = x.reshape(x.shape[0], x.shape[1])
-y = y.reshape(y.shape[0], y.shape[1])
-# checkData(x, y)
-shared_train_set_x = theano.shared(np.asarray(x).astype('float32'), name='X')
-shared_train_set_y = theano.shared(np.asarray(y).astype('float32'), name='y')
-print "Data copying completes"
-timeTook = []
-timeGPU = {}
-for layers in [
-    [784, 300, 150, 70, 10],
-    [784, 600, 300, 150, 70, 10],
-    [784, 1000, 600, 300, 150, 70, 10]
-]:
+if __name__ == "__main__":
+    data = readData("trainingData.json")
+    print "Data Reading Completes"
+    training_data = data[:45000]
+    x, y = zip(*training_data)
+    x = np.array(x)
+    y = np.array(y)
+    x = x.reshape(x.shape[0], x.shape[1])
+    y = y.reshape(y.shape[0], y.shape[1])
+    # checkData(x, y)
+    shared_train_set_x = theano.shared(np.asarray(x).astype('float32'), name='X')
+    shared_train_set_y = theano.shared(np.asarray(y).astype('float32'), name='y')
+    print "Data copying completes"
     timeTook = []
-    net = Network(layers)
-    train_network(net, 0.5, 3.75, 15, [0.2, 0.1, 0.05, 0.025, 0.01],
-                  [15, 25, 35, 40, 45], 1)
-    timeGPU[len(layers)] = timeTook
-f = open("no_layers_GPU.json", "w")
-json.dump(timeGPU, f)
-f.close()
-timeGPU = {}
-for batch_size in [15, 25, 35, 45, 55]:
-    timeTook = []
-    net = Network([784, 300, 150, 70, 10])
-    train_network(net, 0.5, 3.75, batch_size, [0.2, 0.1, 0.05, 0.025, 0.01],
-                  [15, 25, 35, 40, 45], 1)
-    timeGPU[batch_size] = timeTook
-f = open("batch_size_GPU.json", "w")
-json.dump(timeGPU, f)
-f.close()
-# valid_data = data[45000:]
-# x, y = zip(*valid_data)
-# x = np.array(x)
-# y = np.array(y)
-# x = x.reshape(x.shape[0], x.shape[1])
-# y = y.reshape(y.shape[0], y.shape[1])
-# shared_train_set_x = theano.shared(np.asarray(x).astype('float32'), name='X')
-# shared_train_set_y = theano.shared(np.asarray(y).astype('float32'), name='y')
-# print "The accuracy on validation data is : " +\
-#    str(sum(map(float, net.get_output() == net.get_expected()))*100 /
-#        len(y))
-print "Total Time Taken: ", time.time() - time_start
+    timeGPU = {}
+    for layers in [
+        [784, 300, 150, 70, 10],
+        [784, 600, 300, 150, 70, 10],
+        [784, 1000, 600, 300, 150, 70, 10]
+    ]:
+        timeTook = []
+        net = Network(layers)
+        train_network(net, 0.5, 3.75, 15, [0.2, 0.1, 0.05, 0.025, 0.01],
+                      [15, 25, 35, 40, 45], 1)
+        timeGPU[len(layers)] = timeTook
+    f = open("no_layers_GPU.json", "w")
+    json.dump(timeGPU, f)
+    f.close()
+    timeGPU = {}
+    for batch_size in [15, 25, 35, 45, 55]:
+        timeTook = []
+        net = Network([784, 300, 150, 70, 10])
+        train_network(net, 0.5, 3.75, batch_size, [0.2, 0.1, 0.05, 0.025, 0.01],
+                      [15, 25, 35, 40, 45], 1)
+        timeGPU[batch_size] = timeTook
+    f = open("batch_size_GPU.json", "w")
+    json.dump(timeGPU, f)
+    f.close()
+    # valid_data = data[45000:]
+    # x, y = zip(*valid_data)
+    # x = np.array(x)
+    # y = np.array(y)
+    # x = x.reshape(x.shape[0], x.shape[1])
+    # y = y.reshape(y.shape[0], y.shape[1])
+    # shared_train_set_x = theano.shared(np.asarray(x).astype('float32'), name='X')
+    # shared_train_set_y = theano.shared(np.asarray(y).astype('float32'), name='y')
+    # print "The accuracy on validation data is : " +\
+    #    str(sum(map(float, net.get_output() == net.get_expected()))*100 /
+    #        len(y))
+    print "Total Time Taken: ", time.time() - time_start
